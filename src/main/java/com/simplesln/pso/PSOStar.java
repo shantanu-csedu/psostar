@@ -14,14 +14,18 @@ public class PSOStar {
     private final static int MAX_INT = 999999999;
     private final FitnessFunction fitnessFunction;
     private final int n; //crossover distribution index
+    private final int nm; //mutation distribution index
+    private final double minRk;//polymonial mutation will happen if rk <= minRk
     private double gbest = MAX_INT;
 
-    public PSOStar(int numberOfParticles, int w, int c1, int c2,int n, FitnessFunction fitnessFunction){
+    public PSOStar(int numberOfParticles, int w, int c1, int c2,int n,int nm,double minRk, FitnessFunction fitnessFunction){
         this.numberOfParticles = numberOfParticles;
         this.w = w;
         this.c1 = c1;
         this.c2 = c2;
         this.n = n;
+        this.nm = nm;
+        this.minRk = minRk;
         this.fitnessFunction = fitnessFunction;
         particles = new Particle[numberOfParticles];
         for(int i=0;i<numberOfParticles;i++){
@@ -30,18 +34,19 @@ public class PSOStar {
     }
 
     public void iterate(int numOfIterate){
-        gbest = MAX_INT;
         for(int i=0;i<numOfIterate;i++){
             //calculate next best location and velocity
-            calculateNextBestLocation();
+            calculateNextLocation();
 
             //cross over
             crossOver();
+
+            //polynomial mutation
+            polynomialMutation();
         }
     }
 
-    private void calculateNextBestLocation(){
-        double fitness;
+    private void calculateNextLocation(){
         for(int p=0;p<numberOfParticles;p++){
             Particle particle = particles[p];
             particle.velocity = getVelocity(particle,gbest);
@@ -51,30 +56,50 @@ public class PSOStar {
             //adjust limit
             particle.location = adjustLimit(particle.location,fitnessFunction.getLowerLimit(),fitnessFunction.getUpperLimit());
 
-            fitness = fitnessFunction.fitness(particle);
-            if(particle.pbest > fitness){
-                particle.pbest = fitness;
+            particle.fitness = fitnessFunction.fitness(particle);
+            if(particle.pbest > particle.fitness){
+                particle.pbest = particle.fitness;
                 particle.locationBest = particle.location;
             }
-            if(gbest > fitness){
-                gbest = fitness;
+            if(gbest > particle.fitness){
+                gbest = particle.fitness;
+            }
+        }
+    }
+
+
+    private void polynomialMutation(){
+        double rk = Math.random();
+        if(rk <= minRk){
+            for(int p=0;p<numberOfParticles;p++){
+                Particle particle = new PolynomialMutation(particles[p],rk,fitnessFunction,nm).getBestParticle();
+                particles[p] = particle;
             }
         }
     }
 
     private void crossOver(){
         List<Particle> particleList = new ArrayList<Particle>();
-        int pos = 0;
+        Map<Particle,Boolean> particleFilter = new HashMap<Particle, Boolean>();
+
         for(int p1=0;p1<numberOfParticles;p1++){
-            for(int p2 = p1+1; p2 < numberOfParticles ; p2++){
-                Particle[] newParticles = new SBX(particles[p1], particles[p2], n).getBestTwoParticle();
-                particleList.add(newParticles[0]);
-                particleList.add(newParticles[1]);
+            for(int p2 = p1+1; p2 < numberOfParticles ; p2++) {
+                Particle[] newParticles = new SBX(particles[p1], particles[p2], n, fitnessFunction).getBestTwoParticle();
+                if (!particleFilter.containsKey(newParticles[0])) {
+                    particleFilter.put(newParticles[0], true);
+                    particleList.add(newParticles[0]);
+                }
+
+                if (!particleFilter.containsKey(newParticles[1])) {
+                    particleFilter.put(newParticles[1], true);
+                    particleList.add(newParticles[1]);
+                }
             }
         }
+
         Collections.sort(particleList, new Comparator<Particle>() {
             public int compare(Particle o1, Particle o2) {
-                return (int) (o1.location.x - o2.location.x);
+                return Double.compare(o1.fitness, o2.fitness);
             }
         });
 
