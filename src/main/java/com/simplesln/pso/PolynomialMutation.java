@@ -1,5 +1,6 @@
 package com.simplesln.pso;
 
+import com.simplesln.data.Particle;
 import com.simplesln.fitness.FitnessFunction;
 
 public class PolynomialMutation {

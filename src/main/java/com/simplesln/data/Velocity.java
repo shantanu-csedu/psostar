@@ -1,6 +1,8 @@
-package com.simplesln.pso;
+package com.simplesln.data;
 
-public class Velocity extends Dimension{
+import com.simplesln.data.Dimension;
+
+public class Velocity extends Dimension {
     public Velocity(){
         super();
     }

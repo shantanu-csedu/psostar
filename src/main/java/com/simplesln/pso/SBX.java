@@ -1,5 +1,7 @@
 package com.simplesln.pso;
 
+import com.simplesln.data.Location;
+import com.simplesln.data.Particle;
 import com.simplesln.fitness.FitnessFunction;
 
 import java.util.ArrayList;

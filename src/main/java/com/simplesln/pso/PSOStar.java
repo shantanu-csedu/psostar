@@ -1,5 +1,8 @@
 package com.simplesln.pso;
 
+import com.simplesln.data.Location;
+import com.simplesln.data.Particle;
+import com.simplesln.data.Velocity;
 import com.simplesln.fitness.FitnessFunction;
 
 import java.util.*;
@@ -107,7 +110,7 @@ public class PSOStar {
         System.arraycopy(particleList.toArray(new Particle[]{}),0,particles,0,numberOfParticles);
     }
 
-    private Location adjustLimit(Location location,double l,double u){
+    private Location adjustLimit(Location location, double l, double u){
         double diff = 0;
         if(location.x < l){
             // diff = (l-value)

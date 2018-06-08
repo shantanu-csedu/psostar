@@ -1,6 +1,6 @@
 package com.simplesln.fitness;
 
-import com.simplesln.pso.Particle;
+import com.simplesln.data.Particle;
 
 public class Rastrigin extends FitnessFunction{
     Rastrigin(int d,double l, double u) {

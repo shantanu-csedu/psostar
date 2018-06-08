@@ -1,4 +1,4 @@
-package com.simplesln.pso;
+package com.simplesln.data;
 
 public class Dimension {
     public double x = 0;

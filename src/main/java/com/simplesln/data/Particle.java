@@ -1,4 +1,4 @@
-package com.simplesln.pso;
+package com.simplesln.data;
 
 public class Particle {
     public Location location = new Location();
