@@ -2,7 +2,6 @@ package com.simplesln.pso;
 
 import com.simplesln.data.Location;
 import com.simplesln.data.Particle;
-import com.simplesln.data.Velocity;
 import com.simplesln.fitness.FitnessFunction;
 
 import java.util.*;
@@ -19,9 +18,10 @@ public class PSOStar {
     private final int n; //crossover distribution index
     private final int nm; //mutation distribution index
     private final double minRk;//polymonial mutation will happen if rk <= minRk
+    private final int dimensions;
     private double gbest = MAX_INT;
 
-    public PSOStar(int numberOfParticles, int w, int c1, int c2,int n,int nm,double minRk, FitnessFunction fitnessFunction){
+    public PSOStar(int numberOfParticles,int dimensions, int w, int c1, int c2,int n,int nm,double minRk, FitnessFunction fitnessFunction){
         this.numberOfParticles = numberOfParticles;
         this.w = w;
         this.c1 = c1;
@@ -29,10 +29,11 @@ public class PSOStar {
         this.n = n;
         this.nm = nm;
         this.minRk = minRk;
+        this.dimensions = dimensions;
         this.fitnessFunction = fitnessFunction;
         particles = new Particle[numberOfParticles];
         for(int i=0;i<numberOfParticles;i++){
-            particles[i] = new Particle();
+            particles[i] = new Particle(dimensions);
         }
     }
 
@@ -52,18 +53,21 @@ public class PSOStar {
     private void calculateNextLocation(){
         for(int p=0;p<numberOfParticles;p++){
             Particle particle = particles[p];
-            particle.velocity = getVelocity(particle,gbest);
-            particle.location.x += particle.velocity.x;
-            particle.location.y += particle.velocity.y;
-
-            //adjust limit
-            particle.location = adjustLimit(particle.location,fitnessFunction.getLowerLimit(),fitnessFunction.getUpperLimit());
-
+            //function call order is important
+            //update velocity value of d dimension
+            particle.updateVelocity(w,c1,c2,gbest);
+            //update location value from velocity
+            particle.updateLocation();
+            //adjust fitness function data limit
+            particle.adjustLocationLimit(fitnessFunction.getLowerLimit(),fitnessFunction.getUpperLimit());
+            //calculate fitness
             particle.fitness = fitnessFunction.fitness(particle);
+            //calculate pbest
             if(particle.pbest > particle.fitness){
                 particle.pbest = particle.fitness;
                 particle.locationBest = particle.location;
             }
+            //calculate gbest
             if(gbest > particle.fitness){
                 gbest = particle.fitness;
             }
@@ -109,51 +113,6 @@ public class PSOStar {
         //replace old generation with current best new generation
         System.arraycopy(particleList.toArray(new Particle[]{}),0,particles,0,numberOfParticles);
     }
-
-    private Location adjustLimit(Location location, double l, double u){
-        double diff = 0;
-        if(location.x < l){
-            // diff = (l-value)
-            // make sure diff is not exceed range (u-l)
-            // get min of (l-value) and (u-l) to prevent diff not exceed range
-            diff = Math.min((l - location.x),(u-l));
-            location.x = u - diff;
-        }
-        else if(location.x > u){
-            //check previous explanation
-            diff = Math.min((location.x - u),(u-l));
-            location.x = l + diff;
-        }
-        if(location.y < l){
-            // diff = (l-value)
-            // make sure diff is not exceed range (u-l)
-            // get min of (l-value) and (u-l) to prevent diff not exceed range
-            diff = Math.min((l - location.y),(u-l));
-            location.y = u - diff;
-        }
-        else if(location.y > u){
-            //check previous explanation
-            diff = Math.min((location.y - u),(u-l));
-            location.x = l + diff;
-        }
-        return location;
-    }
-
-    private Velocity getVelocity(Particle particle, double gbest) {
-
-        double x = (
-                (particle.velocity.x * w) +
-                        (c1*Math.random()*(particle.pbest - particle.location.x)) +
-                        (c2*Math.random()*(gbest - particle.location.x))
-        );
-        double y = (
-                (particle.velocity.y * w) +
-                        (c1*Math.random()*(particle.pbest - particle.location.y)) +
-                        (c2*Math.random()*(gbest - particle.location.y))
-        );
-        return new Velocity(x,y);
-    }
-
 
     public double getGbest(){
         return gbest;

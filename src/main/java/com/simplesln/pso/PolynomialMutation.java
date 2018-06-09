@@ -15,10 +15,11 @@ public class PolynomialMutation {
         this.nm = mutationDistributionIndex;
         this.rk = rk;
         delta = getDelta();
-        this.child = new Particle();
+        this.child = new Particle(parent.dimension);
         this.child.velocity = parent.velocity;
-        this.child.location.x = parent.location.x + (fitnessFunction.getUpperLimit() - fitnessFunction.getLowerLimit()) * delta;
-        this.child.location.y = parent.location.y + (fitnessFunction.getUpperLimit() - fitnessFunction.getLowerLimit()) * delta;
+        for(int i=0;i<child.dimension;i++) {
+            this.child.location.x[i] = parent.location.x[i] + (fitnessFunction.getUpperLimit() - fitnessFunction.getLowerLimit()) * delta;
+        }
         this.child.fitness = fitnessFunction.fitness(child);
     }
 

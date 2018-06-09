@@ -15,18 +15,18 @@ public class FitnessFactory {
     u : upper limit of Y
 
      */
-    public static FitnessFunction getFitnessFunction(int d,double l,double u, int fitnessFunction){
+    public static FitnessFunction getFitnessFunction(double l,double u, int fitnessFunction){
         switch (fitnessFunction){
             case ROSENBROCK:
-                return new Rosenbrock(d,l,u);
+                return new Rosenbrock(l,u);
             case RASTRIGIN:
-                return new Rastrigin(d,l,u);
+                return new Rastrigin(l,u);
             case SPHERE:
-                return new Sphere(d,l,u);
+                return new Sphere(l,u);
             case ACKLEY:
-                return new Ackley(d,l,u);
+                return new Ackley(l,u);
             case GRIEWANK:
-                return new Griewank(d,l,u);
+                return new Griewank(l,u);
             default:
                 return null;
         }

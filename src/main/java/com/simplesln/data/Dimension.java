@@ -1,12 +1,10 @@
 package com.simplesln.data;
 
 public class Dimension {
-    public double x = 0;
-    public double y = 0;
-    public Dimension(double x,double y){
-        this.x = x;
-        this.y = y;
+    public final int d;
+    public final double x[];
+    public Dimension(int d){
+        this.x = new double[d];
+        this.d = d;
     }
-
-    public Dimension(){}
 }

@@ -6,12 +6,10 @@ import com.simplesln.data.Particle;
 Super class for fitness function
  */
 public abstract class FitnessFunction {
-    protected int d;
     protected double l;
     protected double u;
 
-    FitnessFunction(int d,double l,double u){
-        this.d = d;
+    FitnessFunction(double l,double u){
         this.l = l;
         this.u = u;
     }

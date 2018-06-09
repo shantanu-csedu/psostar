@@ -32,14 +32,14 @@ public class SBX {
         this.fitnessFunction = fitnessFunction;
         this.beta = calculateBeta();
 
-        this.child1 = new Particle();
+        this.child1 = new Particle(parent1.dimension);
         this.child1.velocity = parent1.velocity; //not sure which parent velocity should be inherited
-        this.child1.location = crossOV1();
+        crossOV1(this.child1.location);
         this.child1.fitness = fitnessFunction.fitness(child1);
 
-        this.child2 = new Particle();
+        this.child2 = new Particle(parent2.dimension);
         this.child2.velocity = parent2.velocity;
-        this.child2.location = crossOV2();
+        crossOV2(this.child2.location);
         this.child2.fitness = fitnessFunction.fitness(child2);
     }
 
@@ -56,16 +56,16 @@ public class SBX {
         }
     }
 
-    private Location crossOV1(){
-        double x =  0.5 * ((1.0-beta)*parent1.location.x + (1.0+beta)*parent2.location.x);
-        double y =  0.5 * ((1.0-beta)*parent1.location.y + (1.0+beta)*parent2.location.y);
-        return new Location(x,y);
+    private void crossOV1(Location location){
+        for(int i=0;i<location.d;i++){
+            location.x[i] = 0.5 * ((1.0-beta)*parent1.location.x[i] + (1.0+beta)*parent2.location.x[i]);
+        }
     }
 
-    private Location crossOV2(){
-        double x = 0.5 * ((1.0-beta)*parent2.location.x + (1.0+beta)*parent1.location.x);
-        double y = 0.5 * ((1.0-beta)*parent2.location.y + (1.0+beta)*parent1.location.y);
-        return new Location(x,y);
+    private void crossOV2(Location location){
+        for(int i=0;i<location.d;i++){
+            location.x[i] = 0.5 * ((1.0-beta)*parent2.location.x[i] + (1.0+beta)*parent1.location.x[i]);
+        }
     }
 
     public Particle[] getBestTwoParticle(){
